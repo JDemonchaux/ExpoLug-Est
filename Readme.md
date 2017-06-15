@@ -5,7 +5,7 @@ Application android pour compter les visiteurs lors du salon Lego organisé par 
 
 # Roadmap
 - __DONE__
-    - [server] (nodejs | socket io | mongodb): 
+    - [server] : (nodejs | socket io | mongodb): 
     - Minimum Viable Product
 - __TODO__
     - _Android_  
