@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">CompteurSalonLego</string>
+    <string name="app_title">Compteur Salon Lego</string>
+
+    <string name="label_number_visitor">Visiteur(s) actuellement dans le salon</string>
+
+    <string name="button_activity_in">Gérer les entrées</string>
+    <string name="button_activity_out">Gérer les sorties</string>
+
+    <string name="title_activity_in">Gestion des entrées</string>
+    <string name="title_activity_out">Gestion des sorties</string>
+
+    <string name="button_in_1">+ 1</string>
+    <string name="button_in_2">+ 2</string>
+    <string name="button_in_3">+ 3</string>
+    <string name="button_in_4">+ 4</string>
+    <string name="button_in_5">+ 5</string>
+
+    <string name="button_out_1">- 1</string>
+    <string name="button_out_2">- 2</string>
+    <string name="button_out_3">- 3</string>
+    <string name="button_out_4">- 4</string>
+    <string name="button_out_5">- 5</string>
+
+</resources>
