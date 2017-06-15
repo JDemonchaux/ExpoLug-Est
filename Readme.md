@@ -21,4 +21,4 @@ Application android pour compter les visiteurs lors du salon Lego organisé par 
 
 
 [lugest]: (http://www.lugest.com/)
-[server]: (https://git.devloop.fr/Jerome/ServerSalonLego)
+[server]: https://git.devloop.fr/Jerome/ServerSalonLego
