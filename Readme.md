@@ -1,0 +1,23 @@
+# CompteurSalonLego
+
+Application android pour compter les visiteurs lors du salon Lego organisé par l'association [lugest]
+
+
+# Roadmap
+- __DONE__
+    - Server (nodejs | socket io | mongodb): 
+    - Minimum Viable Product
+- __TODO__
+    - _Android_  
+        - app topbar (bouton back, boutton settings)
+        - SettingsActivity, l'activité pour gérer la configuration du serveur
+        - Notifications
+        - UI
+    - _Server_
+        - Statistiques (temps réél + rapports)
+        - Push event pour notifications (ouverture du salon, fermeture du salon, capacité 99% etc...)
+        - ????
+        - Profit
+
+
+[lugest]: (http://www.lugest.com/)
