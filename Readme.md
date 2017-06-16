@@ -14,7 +14,7 @@ Application android pour compter les visiteurs lors du salon Lego organisé par 
         - Notifications
         - UI
     - _Server_
-        - Statistiques (temps réél + rapports)
+        - Statistiques (temps réél + rapports) [fiddle]
         - Push event pour notifications (ouverture du salon, fermeture du salon, capacité 99% etc...)
         - ????
         - Profit
@@ -22,3 +22,4 @@ Application android pour compter les visiteurs lors du salon Lego organisé par 
 
 [lugest]: (http://www.lugest.com/)
 [server]: https://git.devloop.fr/Jerome/ServerSalonLego
+[fiddle]: http://jsfiddle.net/canvasjs/cm1qyk2L/
