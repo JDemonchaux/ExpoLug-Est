@@ -22,4 +22,6 @@
     <string name="button_out_4">- 4</string>
     <string name="button_out_5">- 5</string>
 
+
+    <string name="menu_settings">Paramètres</string>
 </resources>

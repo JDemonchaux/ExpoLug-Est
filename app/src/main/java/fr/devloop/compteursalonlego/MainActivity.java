@@ -3,14 +3,17 @@ package fr.devloop.compteursalonlego;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
 import fr.devloop.compteursalonlego.Library.Salon;
+import fr.devloop.compteursalonlego.UI.DonutProgress;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,11 +22,15 @@ public class MainActivity extends AppCompatActivity {
     DonutProgress visitor_number;
     Button bt_activity_in;
     Button bt_activity_out;
+    Toolbar toolBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
+        //Initialize toolbar as appbar
+        toolBar = (Toolbar) findViewById(R.id.app_toolbar);
+        setSupportActionBar(toolBar);
 
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
@@ -85,5 +92,24 @@ public class MainActivity extends AppCompatActivity {
 
         visitor_number.setText(number);
         visitor_number.setProgress(Float.valueOf(number));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Construit le menu
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                //goto Settings activity
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

@@ -1,17 +1,20 @@
 package fr.devloop.compteursalonlego;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
 import fr.devloop.compteursalonlego.Library.Salon;
+import fr.devloop.compteursalonlego.UI.DonutProgress;
 
 public class InActivity extends AppCompatActivity {
 
@@ -24,10 +27,19 @@ public class InActivity extends AppCompatActivity {
     Button bt_4;
     Button bt_5;
 
+    Toolbar toolBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_in);
+        //initialize toolbar as appbar
+        toolBar = (Toolbar) findViewById(R.id.app_toolbar);
+        setSupportActionBar(toolBar);
+
+        //set back button
+        ActionBar ab = getSupportActionBar();
+        if (ab!=null) ab.setDisplayHomeAsUpEnabled(true);
 
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
@@ -99,6 +111,12 @@ public class InActivity extends AppCompatActivity {
         socket.connect();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Construit le menu
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
     private void addVisitor(int number) {
         socket.emit(Salon.API_ADD_VISITOR, number);
