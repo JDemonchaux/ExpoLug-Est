@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_category_server">
+        <EditTextPreference
+            android:defaultValue="@string/pref_server_ip"
+            android:key="server_ip"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/settings_label_server_ip" />
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_max_visitor"
+            android:key="server_port"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/settings_label_server_port" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_category_visitor">
+        <EditTextPreference
+            android:defaultValue="@string/pref_max_visitor"
+            android:key="max_visitor"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/settings_label_max_visitor" />
+    </PreferenceCategory>
+</PreferenceScreen>

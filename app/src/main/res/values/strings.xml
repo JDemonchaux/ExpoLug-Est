@@ -23,5 +23,22 @@
     <string name="button_out_5">- 5</string>
 
 
+    <string name="settings_label_server_ip">IP du serveur</string>
+    <string name="settings_label_server_port">Port</string>
+    <string name="settings_label_max_visitor">Nombre de visiteur maximum</string>
+
+    <string name="button_validate">Valider</string>
+
     <string name="menu_settings">Paramètres</string>
+
+    <string name="connection_connecting">Connection en cours…</string>
+    <string name="connection_error">Impossible de joindre le server</string>
+    <string name="connection_success">Connection au serveur réussie</string>
+
+    <!-- Preference strings -->
+    <string name="pref_category_server">Serveur</string>
+    <string name="pref_server_ip">Server ip</string>
+    <string name="pref_server_port">Server port</string>
+    <string name="pref_category_visitor">Visiteur</string>
+    <string name="pref_max_visitor">Max visitor</string>
 </resources>

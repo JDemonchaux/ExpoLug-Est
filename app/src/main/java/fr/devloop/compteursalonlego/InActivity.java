@@ -1,11 +1,13 @@
 package fr.devloop.compteursalonlego;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,6 +21,7 @@ import fr.devloop.compteursalonlego.UI.DonutProgress;
 public class InActivity extends AppCompatActivity {
 
     private Socket socket;
+    private Salon salon;
 
     DonutProgress visitor_number;
     Button bt_1;
@@ -44,7 +47,8 @@ public class InActivity extends AppCompatActivity {
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
 
-        socket = Salon.initSocket();
+        salon = new Salon(this);
+        socket = salon.initSocket();
         socket.connect();
 
         socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
@@ -100,15 +104,16 @@ public class InActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        salon.close();
         super.onBackPressed();
-        socket.close();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        socket = Salon.initSocket();
-        socket.connect();
+        Salon salon = new Salon(this);
+        socket = salon.initSocket();
+        if (!socket.connected()) socket.connect();
     }
 
     @Override
@@ -116,6 +121,20 @@ public class InActivity extends AppCompatActivity {
         // Construit le menu
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_settings:
+                salon.close();
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private void addVisitor(int number) {
