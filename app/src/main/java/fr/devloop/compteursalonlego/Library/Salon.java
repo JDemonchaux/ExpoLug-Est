@@ -8,12 +8,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-import com.github.nkzawa.socketio.client.SocketIOException;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -21,8 +19,16 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.Event.SocketConnectedEvent;
+import fr.devloop.compteursalonlego.Library.Event.SocketConnectionErrorEvent;
+import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
 import fr.devloop.compteursalonlego.MainActivity;
+import fr.devloop.compteursalonlego.OutActivity;
 import fr.devloop.compteursalonlego.R;
+import fr.devloop.compteursalonlego.SettingsActivity;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by jeromedemonchaux on 14/06/2017.
@@ -37,7 +43,7 @@ public class Salon {
 
     private static final String SERVER_PROTOCOL = "http://";
     private static final String SERVER_PORT_SEPARATOR = ":";
-    public static String SERVER_PORT = "";
+    public static final String SERVER_PORT = "3000";
     public static String SERVER_IP = "";
 
     private static String SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;
@@ -45,12 +51,17 @@ public class Salon {
     public static int MAX_VISITOR = 1600; //TODO: get from server
     public static int current_visitor_number;
 
-    public static final String API_GET_VISITOR = "countVisiteur";
-    public static final String API_ADD_VISITOR = "addVisiteur";
-    public static final String API_REMOVE_VISITOR = "removeVisiteur";
-    public static final String API_NOTIFY_VISITOR_FULL = "fullVisiteur";
-
+    public static final String API_GET_VISITOR = "countVisitor";
+    public static final String API_ADD_VISITOR = "addVisitor";
+    public static final String API_REMOVE_VISITOR = "removeVisitor";
+    public static final String API_NOTIFY_VISITOR_FULL = "fullVisitor";
+    public static final String API_MAX_VISITOR = "maxVisitor";
+    public static Integer CURRENT_VISITOR = 1;
     public static final Integer ID_NOTIF_VISITOR_FULL = 1;
+
+    public static final String STATUS_CONNECTED = "connected";
+    public static final String STATUS_ERROR = "error";
+    public static String CURRENT_STATUS = "";
 
 
     private Salon(Context ctx) {
@@ -70,11 +81,9 @@ public class Salon {
 
     private Socket initSocket() {
         try {
-            if (socket == null) {
-                socket = IO.socket(SERVER);
-                socket.connect();
-                listenForNotifications();
-            }
+            socket = IO.socket(SERVER);
+            socket.connect();
+            listenForNotifications();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -85,24 +94,24 @@ public class Salon {
 
     private void readConfig() {
         SERVER_IP = prefs.getString(context.getString(R.string.pref_server_ip), "");
-        SERVER_PORT = prefs.getString(context.getString(R.string.pref_server_port), "");
         MAX_VISITOR = Integer.parseInt(prefs.getString(context.getString(R.string.pref_max_visitor), "0"));
         SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;
     }
 
-    public void saveConfig(EditText ip, EditText port, EditText visitor) {
+    public void saveConfig(EditText ip) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(context.getString(R.string.pref_server_ip), ip.getText().toString());
-        editor.putString(context.getString(R.string.pref_server_port), port.getText().toString());
-        editor.putString(context.getString(R.string.pref_max_visitor), visitor.getText().toString());
         editor.apply();
     }
 
     public void close() {
         current_visitor_number = -1;
-        socket.disconnect();
-        socket.close();
-        socket = null;
+        if (socket != null) {
+            if (socket.connected()) socket.disconnect();
+            socket.close();
+            socket = null;
+            instance = null;
+        }
     }
 
     /**
@@ -110,6 +119,49 @@ public class Salon {
      * And then notify in the app
      */
     private void listenForNotifications() {
+        socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(final Object... args) {
+                Log.d("SOCKETIO", "GET VISITOR");
+                CURRENT_VISITOR = Integer.parseInt(args[0].toString());
+                EventBus.getDefault().post(new SocketGetVisitorEvent());
+            }
+        });
+        socket.on(API_MAX_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "MAX VISITOR");
+                MAX_VISITOR = (Integer) args[0];
+            }
+        });
+
+        socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "CONNECTION ERROR");
+                CURRENT_STATUS = STATUS_ERROR;
+                EventBus.getDefault().post(new SocketConnectionErrorEvent());
+            }
+        });
+
+        socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "DISCONNECT");
+                CURRENT_STATUS = STATUS_ERROR;
+                EventBus.getDefault().post(new SocketConnectionErrorEvent());
+            }
+        });
+
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "CONNECTION SUCCESS");
+                CURRENT_STATUS = STATUS_CONNECTED;
+                EventBus.getDefault().post(new SocketConnectedEvent());
+            }
+        });
+
         socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
             @Override
             public void call(Object... args) {

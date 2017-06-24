@@ -1,5 +1,6 @@
 package fr.devloop.compteursalonlego;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,13 +11,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
+import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
+import io.socket.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class OutActivity extends AppCompatActivity {
     private Socket socket;
@@ -30,6 +34,7 @@ public class OutActivity extends AppCompatActivity {
     Button bt_5;
 
     Toolbar toolBar;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,7 @@ public class OutActivity extends AppCompatActivity {
         //initialize toolbar as appbar
         toolBar = (Toolbar) findViewById(R.id.app_toolbar);
         setSupportActionBar(toolBar);
+        activity = this;
 
         //set back button
         ActionBar ab = getSupportActionBar();
@@ -49,18 +55,6 @@ public class OutActivity extends AppCompatActivity {
         salon = Salon.getInstance(this);
         socket = Salon.socket;
 
-        socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                OutActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateVisitorNumber(args[0].toString());
-                    }
-                });
-            }
-        });
-
         bt_1 = (Button) findViewById(R.id.button_out_1);
         bt_2 = (Button) findViewById(R.id.button_out_2);
         bt_3 = (Button) findViewById(R.id.button_out_3);
@@ -71,33 +65,64 @@ public class OutActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 removeVisitor(1);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) - 1)));
+                    }
+                });
             }
         });
         bt_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 removeVisitor(2);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) - 2)));
+                    }
+                });
             }
         });
         bt_3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 removeVisitor(3);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) - 3)));
+                    }
+                });
             }
         });
         bt_4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 removeVisitor(4);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) - 4)));
+                    }
+                });
             }
         });
         bt_5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 removeVisitor(5);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) - 5)));
+                    }
+                });
             }
         });
 
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
     }
 
     @Override
@@ -113,14 +138,23 @@ public class OutActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Construit le menu
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
-
-
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -134,26 +168,31 @@ public class OutActivity extends AppCompatActivity {
     }
 
     private void removeVisitor(int number) {
-        socket.emit(Salon.API_REMOVE_VISITOR, number);
+        socket.emit(Salon.API_REMOVE_VISITOR, String.valueOf(number));
     }
 
-    private void updateVisitorNumber(String number) {
-        int value = Integer.valueOf(number);
-        if (value <= 0) {
-            bt_1.setEnabled(false);
-            bt_2.setEnabled(false);
-            bt_3.setEnabled(false);
-            bt_4.setEnabled(false);
-            bt_5.setEnabled(false);
-        } else {
-            bt_1.setEnabled(true);
-            bt_2.setEnabled(true);
-            bt_3.setEnabled(true);
-            bt_4.setEnabled(true);
-            bt_5.setEnabled(true);
-        }
+    private void updateVisitorNumber(final Integer number) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int value = Integer.valueOf(number);
+                Float progress = Float.valueOf(number);
+                if (value <= 0) {
+                    progress = 0f;
+                } else {
+                    progress = (float) ((value / Salon.MAX_VISITOR) * 100);
+                }
 
-        visitor_number.setText(number);
-        visitor_number.setProgress(Float.valueOf(number));
+                visitor_number.setText(number.toString());
+                visitor_number.setProgress(progress);
+                visitor_number.setMax(Salon.MAX_VISITOR);
+            }
+        });
+
+    }
+
+    @Subscribe
+    public void onSocketGetVisitorEvent(SocketGetVisitorEvent event) {
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
     }
 }

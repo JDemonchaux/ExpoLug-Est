@@ -29,16 +29,12 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:background="@color/green">
-        <ProgressBar
-            android:id="@+id/indeterminateBarr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/connection_success"
-            android:textColor="@color/greenText"
+            android:textColor="@color/darkGreen"
             android:gravity="center|center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </LinearLayout>
@@ -49,10 +45,6 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:background="@color/red">
-        <ProgressBar
-            android:id="@+id/indeterminateBarrr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="match_parent"

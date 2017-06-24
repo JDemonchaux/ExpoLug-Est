@@ -15,17 +15,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
 import fr.devloop.compteursalonlego.Library.NotificationsUtils;
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,22 +55,7 @@ public class MainActivity extends AppCompatActivity {
         salon = Salon.getInstance(this);
         socket = Salon.socket;
 
-        socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateVisitorNumber(args[0].toString());
-                        Salon.current_visitor_number = Integer.parseInt(args[0].toString());
-                    }
-                });
-            }
-        });
-
-        updateVisitorNumber(String.valueOf(Salon.current_visitor_number));
-
-
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
 
         bt_activity_in = (Button) findViewById(R.id.button_activity_in);
         bt_activity_in.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(out);
             }
         });
-
     }
 
 
@@ -120,11 +104,15 @@ public class MainActivity extends AppCompatActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    private void updateVisitorNumber(String number) {
-        int value = Integer.valueOf(number);
-
-        visitor_number.setText(number);
-        visitor_number.setProgress(Float.valueOf(number));
+    private void updateVisitorNumber(final Integer number) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                visitor_number.setText(number.toString());
+                visitor_number.setProgress(Float.valueOf(number));
+                visitor_number.setMax(Salon.MAX_VISITOR);
+            }
+        });
     }
 
     @Override
@@ -151,4 +139,9 @@ public class MainActivity extends AppCompatActivity {
     public void onSalonAlmostFullEvent(SalonAlmostFullEvent event) {
         NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, MainActivity.class);
     };
+
+    @Subscribe
+    public void onSocketGetVisitorEvent(SocketGetVisitorEvent event) {
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
+    }
 }

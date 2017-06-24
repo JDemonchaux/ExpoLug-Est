@@ -16,10 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import fr.devloop.compteursalonlego.Library.Event.SocketConnectedEvent;
+import fr.devloop.compteursalonlego.Library.Event.SocketConnectionErrorEvent;
 import fr.devloop.compteursalonlego.Library.Salon;
+import io.socket.client.Socket;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -29,7 +34,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     ConstraintLayout layout;
     EditText inputServerIp;
-    EditText inputServerPort;
     EditText inputMaxVisitor;
     LinearLayout connectionConnecting;
     LinearLayout connectionSuccess;
@@ -37,11 +41,11 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     Button btValidate;
+    Button btTestConnection;
 
     Activity activity;
 
     String serverIp;
-    String serverPort;
     String maxVisitor;
     boolean serverConnected;
 
@@ -68,54 +72,27 @@ public class SettingsActivity extends AppCompatActivity {
         connectionError = (LinearLayout) findViewById(R.id.layout_connection_error);
         inputServerIp = (EditText) findViewById(R.id.input_server_ip);
         inputServerIp.setText(Salon.SERVER_IP);
-        inputServerPort = (EditText) findViewById(R.id.input_server_port);
-        inputServerPort.setText(Salon.SERVER_PORT);
-        inputMaxVisitor = (EditText) findViewById(R.id.input_max_visitor);
-        inputMaxVisitor.setText(String.valueOf(Salon.MAX_VISITOR));
         btValidate = (Button) findViewById(R.id.button_validate_settings);
         btValidate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                socket.close();
-                salon.saveConfig(inputServerIp, inputServerPort, inputMaxVisitor);
+                salon.saveConfig(inputServerIp);
+                salon.close();
+                salon = Salon.getInstance(activity);
+                socket = Salon.socket;
                 Intent i = new Intent(activity, MainActivity.class);
                 startActivity(i);
             }
         });
-
-
-
-        socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+        btTestConnection = (Button) findViewById(R.id.button_test_connection);
+        btTestConnection.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void call(Object... args) {
-                Log.d("SOCKETIO", "CONNECTION ERROR");
-                serverConnected = false;
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        connectionConnecting.setVisibility(View.GONE);
-                        connectionSuccess.setVisibility(View.GONE);
-                        connectionError.setVisibility(View.VISIBLE);
-                    }
-                });
+            public void onClick(View view) {
+                salon.saveConfig(inputServerIp);
+                updateConnectionStatus();
             }
         });
-        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Log.d("SOCKETIO", "CONNECTION SUCCESS");
-                serverConnected = true;
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        connectionConnecting.setVisibility(View.GONE);
-                        connectionSuccess.setVisibility(View.VISIBLE);
-                        connectionError.setVisibility(View.GONE);
-                    }
-                });
-            }
-        });
-
+        updateConnectionStatus();
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,6 +113,19 @@ public class SettingsActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+
     // @TODO: déplacer dans un fichier Utils.
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager =
@@ -143,5 +133,42 @@ public class SettingsActivity extends AppCompatActivity {
                         Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+
+    @Subscribe
+    public void onSocketConnected(SocketConnectedEvent event) {
+        updateConnectionStatus();
+    }
+
+    @Subscribe
+    public void onSocketConnectionError(SocketConnectionErrorEvent event) {
+        updateConnectionStatus();
+    }
+
+
+    public void updateConnectionStatus() {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (Salon.CURRENT_STATUS) {
+                    case Salon.STATUS_CONNECTED:
+                        connectionConnecting.setVisibility(View.GONE);
+                        connectionSuccess.setVisibility(View.VISIBLE);
+                        connectionError.setVisibility(View.GONE);
+                        break;
+                    case Salon.STATUS_ERROR:
+                        connectionConnecting.setVisibility(View.GONE);
+                        connectionSuccess.setVisibility(View.GONE);
+                        connectionError.setVisibility(View.VISIBLE);
+                        break;
+                    default:
+                        connectionConnecting.setVisibility(View.VISIBLE);
+                        connectionSuccess.setVisibility(View.GONE);
+                        connectionError.setVisibility(View.GONE);
+                        break;
+                }
+            }
+        });
     }
 }

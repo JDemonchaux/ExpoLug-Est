@@ -1,5 +1,6 @@
 package fr.devloop.compteursalonlego;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
+import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
+import io.socket.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,6 +24,7 @@ import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
 import fr.devloop.compteursalonlego.Library.NotificationsUtils;
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
+import io.socket.emitter.Emitter;
 
 public class InActivity extends AppCompatActivity {
 
@@ -37,6 +39,7 @@ public class InActivity extends AppCompatActivity {
     Button bt_5;
 
     Toolbar toolBar;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,28 +48,18 @@ public class InActivity extends AppCompatActivity {
         //initialize toolbar as appbar
         toolBar = (Toolbar) findViewById(R.id.app_toolbar);
         setSupportActionBar(toolBar);
+        activity = this;
 
         //set back button
         ActionBar ab = getSupportActionBar();
-        if (ab!=null) ab.setDisplayHomeAsUpEnabled(true);
+        if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
 
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
+//        visitor_number.setProgress(Salon.CURRENT_VISITOR);
 
         salon = Salon.getInstance(this);
         socket = Salon.socket;
-
-        socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
-            @Override
-            public void call(final Object... args) {
-                InActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateVisitorNumber(args[0].toString());
-                    }
-                });
-            }
-        });
 
         bt_1 = (Button) findViewById(R.id.button_in_1);
         bt_2 = (Button) findViewById(R.id.button_in_2);
@@ -78,33 +71,64 @@ public class InActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 addVisitor(1);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) + 1)));
+                    }
+                });
             }
         });
         bt_2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addVisitor(2);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) + 2)));
+                    }
+                });
             }
         });
         bt_3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addVisitor(3);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) + 3)));
+                    }
+                });
             }
         });
         bt_4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addVisitor(4);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) + 4)));
+                    }
+                });
             }
         });
         bt_5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addVisitor(5);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        visitor_number.setText(String.valueOf((Integer.parseInt(visitor_number.getText()) + 5)));
+                    }
+                });
             }
         });
 
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
     }
 
     @Override
@@ -151,31 +175,36 @@ public class InActivity extends AppCompatActivity {
     }
 
     private void addVisitor(int number) {
-        socket.emit(Salon.API_ADD_VISITOR, number);
+        socket.emit(Salon.API_ADD_VISITOR, String.valueOf(number));
     }
 
-    private void updateVisitorNumber(String number) {
-        int value = Integer.valueOf(number);
-        if (value >= (Salon.MAX_VISITOR * 0.99)) {
-            bt_1.setEnabled(false);
-            bt_2.setEnabled(false);
-            bt_3.setEnabled(false);
-            bt_4.setEnabled(false);
-            bt_5.setEnabled(false);
-        } else {
-            bt_1.setEnabled(true);
-            bt_2.setEnabled(true);
-            bt_3.setEnabled(true);
-            bt_4.setEnabled(true);
-            bt_5.setEnabled(true);
-        }
-
-        visitor_number.setText(number);
-        visitor_number.setProgress(Float.valueOf(number));
+    private void updateVisitorNumber(final Integer number) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int value = number;
+                Float progress = Float.valueOf(number);
+                if (value > (Salon.MAX_VISITOR * 0.99)) {
+                    progress = 100f;
+                } else {
+                    progress = (float) ((value / Salon.MAX_VISITOR) * 100);
+                }
+                visitor_number.setText(number.toString());
+                visitor_number.setProgress(progress);
+                visitor_number.setMax(Salon.MAX_VISITOR);
+            }
+        });
     }
 
     @Subscribe
     public void onSalonAlmostFullEvent(SalonAlmostFullEvent event) {
         NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, InActivity.class);
-    };
+    }
+
+    ;
+
+    @Subscribe
+    public void onSocketGetVisitorEvent(SocketGetVisitorEvent event) {
+        updateVisitorNumber(Salon.CURRENT_VISITOR);
+    }
 }
