@@ -15,6 +15,12 @@ import android.widget.TextView;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.NotificationsUtils;
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
 
@@ -47,9 +53,8 @@ public class InActivity extends AppCompatActivity {
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
 
-        salon = new Salon(this);
-        socket = salon.initSocket();
-        socket.connect();
+        salon = Salon.getInstance(this);
+        socket = Salon.socket;
 
         socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
             @Override
@@ -104,15 +109,13 @@ public class InActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        salon.close();
         super.onBackPressed();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Salon salon = new Salon(this);
-        socket = salon.initSocket();
+        socket = Salon.socket;
         if (!socket.connected()) socket.connect();
     }
 
@@ -123,17 +126,27 @@ public class InActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                salon.close();
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
@@ -160,4 +173,9 @@ public class InActivity extends AppCompatActivity {
         visitor_number.setText(number);
         visitor_number.setProgress(Float.valueOf(number));
     }
+
+    @Subscribe
+    public void onSalonAlmostFullEvent(SalonAlmostFullEvent event) {
+        NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, InActivity.class);
+    };
 }

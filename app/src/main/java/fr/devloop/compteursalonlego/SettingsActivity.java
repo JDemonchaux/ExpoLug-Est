@@ -60,9 +60,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (ab != null) ab.setDisplayHomeAsUpEnabled(true);
 
         activity = this;
-        salon = new Salon(this);
-        socket = salon.initSocket();
-        if (!socket.connected()) socket.connect();
+        salon = Salon.getInstance(this);
+        socket = Salon.socket;
 
         connectionConnecting = (LinearLayout) findViewById(R.id.layout_connection_connecting);
         connectionSuccess = (LinearLayout) findViewById(R.id.layout_connection_success);
@@ -134,7 +133,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        socket.close();
         super.onBackPressed();
     }
 

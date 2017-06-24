@@ -13,6 +13,8 @@ import android.widget.Button;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.greenrobot.eventbus.EventBus;
+
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
 
@@ -44,9 +46,8 @@ public class OutActivity extends AppCompatActivity {
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
 
-        salon = new Salon(this);
-        socket = salon.initSocket();
-        if (!socket.connected()) socket.connect();
+        salon = Salon.getInstance(this);
+        socket = Salon.socket;
 
         socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
             @Override
@@ -101,15 +102,13 @@ public class OutActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        salon.close();
         super.onBackPressed();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Salon salon = new Salon(this);
-        socket = salon.initSocket();
+        socket = Salon.socket;
         if (!socket.connected()) socket.connect();
     }
 
@@ -120,10 +119,12 @@ public class OutActivity extends AppCompatActivity {
         return true;
     }
 
+
+
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                socket.close();
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;

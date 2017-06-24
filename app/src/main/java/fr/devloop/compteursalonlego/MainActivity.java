@@ -1,8 +1,12 @@
 package fr.devloop.compteursalonlego;
 
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,6 +18,12 @@ import android.widget.Button;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.NotificationsUtils;
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
 
@@ -42,9 +52,8 @@ public class MainActivity extends AppCompatActivity {
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
 
-        salon = new Salon(this);
-        socket = salon.initSocket();
-        if (!socket.connected()) socket.connect();
+        salon = Salon.getInstance(this);
+        socket = Salon.socket;
 
         socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
             @Override
@@ -67,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         bt_activity_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                salon.close();
                 Intent in = new Intent(getApplicationContext(), InActivity.class);
                 startActivity(in);
             }
@@ -77,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         bt_activity_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                salon.close();
                 Intent out = new Intent(getApplicationContext(), OutActivity.class);
                 startActivity(out);
             }
@@ -88,20 +95,30 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        salon.close();
         super.onBackPressed();
     }
 
     @Override
     protected void onResume() {
         if (socket == null) {
-            socket = new Salon(this).initSocket();
+            socket = Salon.socket;
         } else if (!socket.connected()) {
             socket.connect();
         }
         super.onResume();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
 
     private void updateVisitorNumber(String number) {
         int value = Integer.valueOf(number);
@@ -120,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_settings:
-                salon.close();
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
@@ -130,4 +146,9 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSalonAlmostFullEvent(SalonAlmostFullEvent event) {
+        NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, MainActivity.class);
+    };
 }
