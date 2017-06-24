@@ -11,7 +11,7 @@ Application android pour compter les visiteurs lors du salon Lego organisé par 
     - _Android_  
         - ~~app topbar (bouton back, boutton settings)~~ DONE
         - ~~SettingsActivity, l'activité pour gérer la configuration du serveur~~ DONE
-        - Notifications
+        - ~~Notifications~~ DONE
         - UI
     - _Server_
         - Statistiques (temps réél + rapports) [fiddle]
