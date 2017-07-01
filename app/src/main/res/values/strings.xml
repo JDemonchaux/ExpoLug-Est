@@ -10,17 +10,17 @@
     <string name="title_activity_in">Gestion des entrées</string>
     <string name="title_activity_out">Gestion des sorties</string>
 
-    <string name="button_in_1">+ 1</string>
-    <string name="button_in_2">+ 2</string>
-    <string name="button_in_3">+ 3</string>
-    <string name="button_in_4">+ 4</string>
-    <string name="button_in_5">+ 5</string>
+    <string name="button_in_1">+1</string>
+    <string name="button_in_2">+2</string>
+    <string name="button_in_3">+3</string>
+    <string name="button_in_4">+4</string>
+    <string name="button_in_5">+5</string>
 
-    <string name="button_out_1">- 1</string>
-    <string name="button_out_2">- 2</string>
-    <string name="button_out_3">- 3</string>
-    <string name="button_out_4">- 4</string>
-    <string name="button_out_5">- 5</string>
+    <string name="button_out_1">-1</string>
+    <string name="button_out_2">-2</string>
+    <string name="button_out_3">-3</string>
+    <string name="button_out_4">-4</string>
+    <string name="button_out_5">-5</string>
 
 
     <string name="settings_label_server_ip">IP du serveur</string>
@@ -41,4 +41,9 @@
     <string name="pref_server_port">Server port</string>
     <string name="pref_category_visitor">Visiteur</string>
     <string name="pref_max_visitor">Max visitor</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="powered_by_devloop">Powered by Devloop</string>
 </resources>

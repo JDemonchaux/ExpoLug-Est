@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.NetworkOnMainThreadException;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -15,7 +16,10 @@ import android.widget.EditText;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
@@ -41,15 +45,15 @@ public class Salon {
     private static SharedPreferences prefs;
     private Context context;
 
-    private static final String SERVER_PROTOCOL = "http://";
-    private static final String SERVER_PORT_SEPARATOR = ":";
+    public static Boolean serverDiscovered = false;
+    public static final String SERVER_PROTOCOL = "http://";
+    public static final String SERVER_PORT_SEPARATOR = ":";
     public static final String SERVER_PORT = "3000";
     public static String SERVER_IP = "";
 
-    private static String SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;
+    public static String SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;
 
-    public static int MAX_VISITOR = 1600; //TODO: get from server
-    public static int current_visitor_number;
+    public static int MAX_VISITOR = 1600;
 
     public static final String API_GET_VISITOR = "countVisitor";
     public static final String API_ADD_VISITOR = "addVisitor";
@@ -62,6 +66,8 @@ public class Salon {
     public static final String STATUS_CONNECTED = "connected";
     public static final String STATUS_ERROR = "error";
     public static String CURRENT_STATUS = "";
+
+    public static Integer current_visitor = 0;
 
 
     private Salon(Context ctx) {
@@ -94,23 +100,68 @@ public class Salon {
 
     private void readConfig() {
         SERVER_IP = prefs.getString(context.getString(R.string.pref_server_ip), "");
-        MAX_VISITOR = Integer.parseInt(prefs.getString(context.getString(R.string.pref_max_visitor), "0"));
+        MAX_VISITOR = Integer.parseInt(prefs.getString(context.getString(R.string.pref_max_visitor), "1"));
         SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;
     }
 
     public void saveConfig(EditText ip) {
+        saveConfig(ip.getText().toString());
+    }
+
+    public void saveConfig(String ip) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(context.getString(R.string.pref_server_ip), ip.getText().toString());
+        editor.putString(context.getString(R.string.pref_server_ip), ip);
         editor.apply();
     }
 
     public void close() {
-        current_visitor_number = -1;
+        current_visitor = 0;
         if (socket != null) {
             if (socket.connected()) socket.disconnect();
             socket.close();
             socket = null;
             instance = null;
+        }
+    }
+
+    public static boolean isServerReachable(String ip) {
+        boolean reachable = false;
+        try {
+            String url = SERVER_PROTOCOL + ip + SERVER_PORT_SEPARATOR + SERVER_PORT;
+            Socket s = IO.socket(url);
+            s.connect();
+            Thread.sleep(1000);
+            reachable = s.connected();
+            s.close();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return reachable;
+
+    }
+
+    public static void testConnection(String ip) {
+        boolean connected = false;
+        try {
+            String url = SERVER_PROTOCOL + ip + SERVER_PORT_SEPARATOR + SERVER_PORT;
+            Socket s = IO.socket(url);
+            s.connect();
+            Thread.sleep(1000);
+            connected = s.connected();
+            s.close();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (connected) {
+            CURRENT_STATUS = STATUS_CONNECTED;
+        } else {
+            CURRENT_STATUS = STATUS_ERROR;
         }
     }
 
@@ -132,6 +183,13 @@ public class Salon {
             public void call(Object... args) {
                 Log.d("SOCKETIO", "MAX VISITOR");
                 MAX_VISITOR = (Integer) args[0];
+            }
+        });
+
+        socket.on(API_GET_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                current_visitor = (Integer) args[0];
             }
         });
 

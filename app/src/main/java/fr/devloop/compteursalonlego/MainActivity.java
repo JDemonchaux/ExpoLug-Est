@@ -89,20 +89,11 @@ public class MainActivity extends AppCompatActivity {
         } else if (!socket.connected()) {
             socket.connect();
         }
+        updateVisitorNumber(Salon.current_visitor);
         super.onResume();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
 
     private void updateVisitorNumber(final Integer number) {
         this.runOnUiThread(new Runnable() {
@@ -128,11 +119,27 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(this, SettingsActivity.class);
                 startActivity(i);
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+
+    /*
+     * EventBus
+     */
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

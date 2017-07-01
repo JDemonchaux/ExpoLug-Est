@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0000FF</color>
-    <color name="colorPrimaryDark">#002541</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#d84315</color>
+    <color name="colorPrimaryDark">#8b2b0d</color>
+    <color name="colorAccent">#ffcb2d</color>
+
 
     <color name="red">#FF0000</color>
     <color name="darkRed">#80081B</color>
@@ -14,8 +15,16 @@
     <color name="green">#00CC00</color>
 
     <color name="gray">#9e9e9e</color>
-    <color name="grayText">#424242 </color>
+    <color name="grayText">#424242</color>
 
     <color name="white">#FFFFFF</color>
 
+    <color name="black_overlay">#66000000</color>
+
+    <color name="devloopYellow">#ffdb8b</color>
+    <color name="devloopYellowMain">#ffe082</color>
+    <color name="devloopYellowMainDark">#ffcb2d</color>
+    <color name="devloopRed">#c64022</color>
+    <color name="devloopRedMain">#d84315</color>
+    <color name="devloopRedMainDark">#8b2b0d</color>
 </resources>

@@ -17,6 +17,8 @@ import io.socket.client.Socket;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+
 import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
 import io.socket.client.Socket;
@@ -32,6 +34,7 @@ public class OutActivity extends AppCompatActivity {
     Button bt_3;
     Button bt_4;
     Button bt_5;
+    ArrayList<Button> buttons;
 
     Toolbar toolBar;
     Activity activity;
@@ -60,6 +63,12 @@ public class OutActivity extends AppCompatActivity {
         bt_3 = (Button) findViewById(R.id.button_out_3);
         bt_4 = (Button) findViewById(R.id.button_out_4);
         bt_5 = (Button) findViewById(R.id.button_out_5);
+        buttons = new ArrayList<Button>();
+        buttons.add(bt_1);
+        buttons.add(bt_2);
+        buttons.add(bt_3);
+        buttons.add(bt_4);
+        buttons.add(bt_5);
 
         bt_1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,18 +147,6 @@ public class OutActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Construit le menu
         getMenuInflater().inflate(R.menu.main, menu);
@@ -186,9 +183,37 @@ public class OutActivity extends AppCompatActivity {
                 visitor_number.setText(number.toString());
                 visitor_number.setProgress(progress);
                 visitor_number.setMax(Salon.MAX_VISITOR);
+
+                if (value < 5) {
+                    for (Button b : buttons) {
+                        if (Math.abs(Integer.valueOf(b.getText().toString())) > value) {
+                            b.setEnabled(false);
+                        } else {
+                            b.setEnabled(true);
+                        }
+                    }
+                }
             }
         });
 
+    }
+
+
+    /**
+     * EventBus
+     */
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe

@@ -3,6 +3,7 @@ package fr.devloop.compteursalonlego;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -88,8 +89,19 @@ public class SettingsActivity extends AppCompatActivity {
         btTestConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                salon.saveConfig(inputServerIp);
-                updateConnectionStatus();
+                String ip = inputServerIp.getText().toString();
+                if (!ip.equals("")) {
+                    showConnectingStatus();
+                    Salon.testConnection(ip);
+                    Handler mHandler = new Handler();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateConnectionStatus();
+                        }
+                    }, 1100);
+
+                }
             }
         });
         updateConnectionStatus();
@@ -168,6 +180,17 @@ public class SettingsActivity extends AppCompatActivity {
                         connectionError.setVisibility(View.GONE);
                         break;
                 }
+            }
+        });
+    }
+
+    public void showConnectingStatus() {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                connectionConnecting.setVisibility(View.VISIBLE);
+                connectionSuccess.setVisibility(View.GONE);
+                connectionError.setVisibility(View.GONE);
             }
         });
     }
