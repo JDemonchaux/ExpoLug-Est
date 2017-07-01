@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,7 +28,7 @@ import fr.devloop.compteursalonlego.UI.DonutProgress;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends LegoActivity {
 
     private Socket socket;
     private Salon salon;
@@ -35,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
     DonutProgress visitor_number;
     Button bt_activity_in;
     Button bt_activity_out;
-    Toolbar toolBar;
-
     Activity activity;
 
     @Override
@@ -45,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.layout_main);
         activity = this;
 
-        //Initialize toolbar as appbar
-        toolBar = (Toolbar) findViewById(R.id.app_toolbar);
-        setSupportActionBar(toolBar);
+        super.setActionBar(this);
 
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);

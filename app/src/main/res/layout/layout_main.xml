@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorSecondary"
     android:orientation="vertical"
     tools:context="fr.devloop.compteursalonlego.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="2">
 
         <include
             android:id="@+id/appbar"
@@ -23,36 +25,43 @@
             layout="@layout/layout_visitor_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp" />
+            android:layout_margin="8dp" />
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
-    <Button
-        android:id="@+id/button_activity_out"
-        android:layout_width="195dp"
-        android:layout_height="116dp"
-        android:layout_gravity="start|bottom"
-        android:layout_margin="8dp"
-        android:text="@string/button_activity_out"
-        android:background="@drawable/button_devloop_red"
-        android:textColor="@color/devloopYellowMainDark"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
 
-    <Button
-        android:id="@+id/button_activity_in"
-        android:layout_width="195dp"
-        android:layout_height="116dp"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="8dp"
-        android:background="@drawable/button_devloop_yellow"
-        android:text="@string/button_activity_in"
-        android:textColor="@color/devloopRedMainDark"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"/>
+            <Button
+                android:id="@+id/button_activity_out"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start|bottom"
+                android:layout_margin="8dp"
+                android:background="@drawable/_button_main_out"
+                android:padding="32dp"
+                android:text="@string/button_activity_out"
+                android:textColor="@color/colorSecondaryText"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_activity_in"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="8dp"
+                android:background="@drawable/_button_main_in"
+                android:padding="32dp"
+                android:text="@string/button_activity_in"
+                android:textColor="@color/colorSecondaryText"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

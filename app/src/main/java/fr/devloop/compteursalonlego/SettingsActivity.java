@@ -27,7 +27,7 @@ import fr.devloop.compteursalonlego.Library.Event.SocketConnectionErrorEvent;
 import fr.devloop.compteursalonlego.Library.Salon;
 import io.socket.client.Socket;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends LegoActivity {
 
     Toolbar toolBar;
     Salon salon;
@@ -56,9 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.layout_settings);
         layout = (ConstraintLayout) findViewById(R.id.layout_settings);
 
-        //initialize toolbar as appbar
-        toolBar = (Toolbar) findViewById(R.id.app_toolbar);
-        setSupportActionBar(toolBar);
+        super.setActionBar(this);
 
         //set back button
         ActionBar ab = getSupportActionBar();

@@ -34,6 +34,7 @@
             android:name=".InActivity"
             android:configChanges="orientation|keyboardHidden"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeAlt"
             android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -56,6 +57,7 @@
             android:name=".SettingsActivity"
             android:configChanges="orientation|keyboardHidden"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeAlt"
             android:screenOrientation="portrait">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->

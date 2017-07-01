@@ -48,7 +48,7 @@ public class Salon {
     public static Boolean serverDiscovered = false;
     public static final String SERVER_PROTOCOL = "http://";
     public static final String SERVER_PORT_SEPARATOR = ":";
-    public static final String SERVER_PORT = "3000";
+    public static final String SERVER_PORT = "7360";
     public static String SERVER_IP = "";
 
     public static String SERVER = SERVER_PROTOCOL + SERVER_IP + SERVER_PORT_SEPARATOR + SERVER_PORT;

@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#d84315</color>
-    <color name="colorPrimaryDark">#8b2b0d</color>
-    <color name="colorAccent">#ffcb2d</color>
+    <color name="colorPrimary">#e53935</color>
+    <color name="colorPrimaryDark">#b71c1c</color>
+    <color name="colorAccent">#26a69a</color>
+    <color name="colorAccentDark">#00796b</color>
 
+    <color name="colorPrimaryDarkDisabled">#80b71c1c</color>
+    <color name="colorAccentDarkDisabled">#8000796b</color>
+
+    <color name="colorSecondary">#e0e0e0</color>
+    <color name="colorSecondaryAccent">#607d8b</color>
+
+    <color name="colorPrimaryText">#b71c1c</color>
+    <color name="colorSecondaryText">#FFF</color>
 
     <color name="red">#FF0000</color>
     <color name="darkRed">#80081B</color>
@@ -27,4 +36,5 @@
     <color name="devloopRed">#c64022</color>
     <color name="devloopRedMain">#d84315</color>
     <color name="devloopRedMainDark">#8b2b0d</color>
+
 </resources>

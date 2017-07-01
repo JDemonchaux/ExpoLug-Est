@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layout_settings"
-    tools:context="fr.devloop.compteursalonlego.SettingsActivity">
+    tools:context="fr.devloop.compteursalonlego.SettingsActivity"
+    android:background="@color/colorSecondary">
 
     <include
         layout="@layout/layout_top_bar"

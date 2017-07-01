@@ -26,7 +26,7 @@ import fr.devloop.compteursalonlego.Library.Salon;
 import fr.devloop.compteursalonlego.UI.DonutProgress;
 import io.socket.emitter.Emitter;
 
-public class InActivity extends AppCompatActivity {
+public class InActivity extends LegoActivity {
 
     private Socket socket;
     private Salon salon;
@@ -45,9 +45,8 @@ public class InActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_in);
-        //initialize toolbar as appbar
-        toolBar = (Toolbar) findViewById(R.id.app_toolbar);
-        setSupportActionBar(toolBar);
+
+        super.setActionBar(this);
         activity = this;
 
         //set back button
