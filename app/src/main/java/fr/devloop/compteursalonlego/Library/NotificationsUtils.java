@@ -37,4 +37,24 @@ public class NotificationsUtils {
                 (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(Salon.ID_NOTIF_VISITOR_FULL, mBuilder.build());
     }
+
+    public static void notifySalonFull(Context ctx, Integer visitorNumber, Class parentActivity) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(ctx);
+        mBuilder.setSmallIcon(R.drawable.ico_settings);
+        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+        mBuilder.setContentTitle("Salon Lego");
+        mBuilder.setContentText("Attention, le salon est plein! " + visitorNumber.toString() + " visiteurs!");
+
+
+        Intent resultIntent = new Intent(ctx, parentActivity);
+        PendingIntent pendingIntent = PendingIntent.getActivity(ctx, 113, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(pendingIntent);
+        mBuilder.setAutoCancel(true);
+        mBuilder.setFullScreenIntent(pendingIntent, true);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(Salon.ID_NOTIF_VISITOR_FULL, mBuilder.build());
+    }
 }

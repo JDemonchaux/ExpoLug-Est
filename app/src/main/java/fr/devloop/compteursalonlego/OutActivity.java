@@ -51,8 +51,10 @@ public class OutActivity extends LegoActivity {
         ActionBar ab = getSupportActionBar();
         if (ab!=null) ab.setDisplayHomeAsUpEnabled(true);
 
+
         visitor_number = (DonutProgress) findViewById(R.id.current_visitor);
         visitor_number.setMax(Salon.MAX_VISITOR);
+
 
         salon = Salon.getInstance(this);
         socket = Salon.socket;
@@ -173,10 +175,12 @@ public class OutActivity extends LegoActivity {
             public void run() {
                 int value = Integer.valueOf(number);
                 Float progress = Float.valueOf(number);
-                if (value <= 0) {
+                if (value > (Salon.MAX_VISITOR * 0.99)) {
+                    OutActivity.super.setProgressFinishedColor(visitor_number);
+                } else if (value <= 0) {
                     progress = 0f;
                 } else {
-                    progress = (float) ((value / Salon.MAX_VISITOR) * 100);
+                    OutActivity.super.setProgressingColor(visitor_number);
                 }
 
                 visitor_number.setText(number.toString());

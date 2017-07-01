@@ -2,6 +2,7 @@ package fr.devloop.compteursalonlego;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.constraint.solver.ArrayLinkedVariables;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,12 +14,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import fr.devloop.compteursalonlego.Library.Event.SalonFullEvent;
 import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
 import io.socket.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
 import fr.devloop.compteursalonlego.Library.NotificationsUtils;
@@ -37,6 +41,7 @@ public class InActivity extends LegoActivity {
     Button bt_3;
     Button bt_4;
     Button bt_5;
+    ArrayList<Button> buttons;
 
     Toolbar toolBar;
     Activity activity;
@@ -65,6 +70,12 @@ public class InActivity extends LegoActivity {
         bt_3 = (Button) findViewById(R.id.button_in_3);
         bt_4 = (Button) findViewById(R.id.button_in_4);
         bt_5 = (Button) findViewById(R.id.button_in_5);
+        buttons = new ArrayList<Button>();
+        buttons.add(bt_1);
+        buttons.add(bt_2);
+        buttons.add(bt_3);
+        buttons.add(bt_4);
+        buttons.add(bt_5);
 
         bt_1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,13 +195,24 @@ public class InActivity extends LegoActivity {
                 int value = number;
                 Float progress = Float.valueOf(number);
                 if (value > (Salon.MAX_VISITOR * 0.99)) {
-                    progress = 100f;
+                    InActivity.super.setProgressFinishedColor(visitor_number);
                 } else {
-                    progress = (float) ((value / Salon.MAX_VISITOR) * 100);
+                    InActivity.super.setProgressingColor(visitor_number);
                 }
                 visitor_number.setText(number.toString());
                 visitor_number.setProgress(progress);
                 visitor_number.setMax(Salon.MAX_VISITOR);
+
+                if ((value + 5) > Salon.MAX_VISITOR) {
+                    for (Button b : buttons) {
+                        if ((value + Math.abs(Integer.valueOf(b.getText().toString()))) > Salon.MAX_VISITOR) {
+                            b.setEnabled(false);
+                        } else {
+                            b.setEnabled(true);
+                        }
+                    }
+                }
+
             }
         });
     }
@@ -200,7 +222,10 @@ public class InActivity extends LegoActivity {
         NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, InActivity.class);
     }
 
-    ;
+    @Subscribe
+    public void onSalonFullEvent(SalonFullEvent event) {
+        NotificationsUtils.notifySalonFull(this, event.visitorNumber, InActivity.class);
+    }
 
     @Subscribe
     public void onSocketGetVisitorEvent(SocketGetVisitorEvent event) {

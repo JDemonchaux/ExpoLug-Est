@@ -8,7 +8,7 @@
         android:id="@+id/layout_connection_connecting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray">
+        android:visibility="visible">
         <ProgressBar
             android:id="@+id/indeterminateBar"
             android:layout_width="wrap_content"
@@ -27,14 +27,21 @@
         android:id="@+id/layout_connection_success"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="@color/green">
+        android:visibility="gone">
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="32dp"
+            android:layout_margin="8dp"
+            android:background="@color/colorAccent">
+        </View>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/connection_success"
-            android:textColor="@color/darkGreen"
+            android:textColor="@color/colorAccent"
             android:gravity="center|center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </LinearLayout>
@@ -43,14 +50,20 @@
         android:id="@+id/layout_connection_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="@color/red">
+        android:visibility="gone">
 
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="32dp"
+            android:layout_margin="8dp"
+            android:background="@color/colorPrimaryDark">
+        </View>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/connection_error"
-            android:textColor="#FFF"
+            android:textColor="@color/colorPrimaryDark"
             android:gravity="center|center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
     </LinearLayout>

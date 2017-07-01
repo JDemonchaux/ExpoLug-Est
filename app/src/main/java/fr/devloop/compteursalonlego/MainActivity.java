@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +22,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.Event.SalonFullEvent;
 import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
 import fr.devloop.compteursalonlego.Library.NotificationsUtils;
 import fr.devloop.compteursalonlego.Library.Salon;
@@ -52,7 +54,14 @@ public class MainActivity extends LegoActivity {
         salon = Salon.getInstance(this);
         socket = Salon.socket;
 
-        updateVisitorNumber(Salon.CURRENT_VISITOR);
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateVisitorNumber(Salon.CURRENT_VISITOR);
+            }
+        }, 500);
+
 
         bt_activity_in = (Button) findViewById(R.id.button_activity_in);
         bt_activity_in.setOnClickListener(new View.OnClickListener() {
@@ -96,8 +105,14 @@ public class MainActivity extends LegoActivity {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                float value = Float.valueOf(number);
+                if (value > (Salon.MAX_VISITOR * 0.99)) {
+                    MainActivity.super.setProgressFinishedColor(visitor_number);
+                } else {
+                    MainActivity.super.setProgressingColor(visitor_number);
+                }
                 visitor_number.setText(number.toString());
-                visitor_number.setProgress(Float.valueOf(number));
+                visitor_number.setProgress(value);
                 visitor_number.setMax(Salon.MAX_VISITOR);
             }
         });
@@ -139,10 +154,15 @@ public class MainActivity extends LegoActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onSalonAlmostFullEvent(SalonAlmostFullEvent event) {
-        NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, MainActivity.class);
-    };
+        NotificationsUtils.notifySalonAlmostFull(this, event.visitorNumber, InActivity.class);
+    }
+
+    @Subscribe
+    public void onSalonFullEvent(SalonFullEvent event) {
+        NotificationsUtils.notifySalonFull(this, event.visitorNumber, InActivity.class);
+    }
 
     @Subscribe
     public void onSocketGetVisitorEvent(SocketGetVisitorEvent event) {

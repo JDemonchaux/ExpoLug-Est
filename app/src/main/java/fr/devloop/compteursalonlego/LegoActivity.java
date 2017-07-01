@@ -6,6 +6,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import fr.devloop.compteursalonlego.UI.DonutProgress;
+
 /**
  * Created by jerom on 01/07/2017.
  */
@@ -13,11 +15,12 @@ import android.support.v7.widget.Toolbar;
 public class LegoActivity extends AppCompatActivity {
 
     Toolbar toolBar;
+    Activity activity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        activity = this;
     }
 
 
@@ -34,5 +37,25 @@ public class LegoActivity extends AppCompatActivity {
         toolBar.setBackgroundColor(ContextCompat.getColor(this, bgColor));
         toolBar.setTitleTextColor(ContextCompat.getColor(this, textColor));
         setSupportActionBar(toolBar);
+    }
+
+    public void setProgressingColor(final DonutProgress visitor_number) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                visitor_number.setUnfinishedStrokeColor(ContextCompat.getColor(activity, R.color.colorSecondary));
+                visitor_number.setFinishedStrokeColor(ContextCompat.getColor(activity, R.color.colorAccent));
+            }
+        });
+    }
+
+    public void setProgressFinishedColor(final DonutProgress visitor_number) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                visitor_number.setUnfinishedStrokeColor(ContextCompat.getColor(activity, R.color.colorPrimary));
+                visitor_number.setFinishedStrokeColor(ContextCompat.getColor(activity, R.color.colorPrimary));
+            }
+        });
     }
 }

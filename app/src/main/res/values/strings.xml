@@ -32,7 +32,7 @@
     <string name="menu_settings">Paramètres</string>
 
     <string name="connection_connecting">Connection en cours…</string>
-    <string name="connection_error">Impossible de joindre le server</string>
+    <string name="connection_error">Impossible de joindre le serveur</string>
     <string name="connection_success">Connection au serveur réussie</string>
 
     <!-- Preference strings -->

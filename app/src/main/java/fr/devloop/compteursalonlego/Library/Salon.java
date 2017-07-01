@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import fr.devloop.compteursalonlego.Library.Event.SalonAlmostFullEvent;
+import fr.devloop.compteursalonlego.Library.Event.SalonFullEvent;
 import fr.devloop.compteursalonlego.Library.Event.SocketConnectedEvent;
 import fr.devloop.compteursalonlego.Library.Event.SocketConnectionErrorEvent;
 import fr.devloop.compteursalonlego.Library.Event.SocketGetVisitorEvent;
@@ -59,6 +60,7 @@ public class Salon {
     public static final String API_ADD_VISITOR = "addVisitor";
     public static final String API_REMOVE_VISITOR = "removeVisitor";
     public static final String API_NOTIFY_VISITOR_FULL = "fullVisitor";
+    public static final String API_NOTIFY_VISITOR_ALMOST_FULL = "almostFullVisitor";
     public static final String API_MAX_VISITOR = "maxVisitor";
     public static Integer CURRENT_VISITOR = 1;
     public static final Integer ID_NOTIF_VISITOR_FULL = 1;
@@ -115,7 +117,7 @@ public class Salon {
     }
 
     public void close() {
-        current_visitor = 0;
+        current_visitor = 1;
         if (socket != null) {
             if (socket.connected()) socket.disconnect();
             socket.close();
@@ -190,6 +192,20 @@ public class Salon {
             @Override
             public void call(Object... args) {
                 current_visitor = (Integer) args[0];
+            }
+        });
+
+        socket.on(API_NOTIFY_VISITOR_ALMOST_FULL, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new SalonAlmostFullEvent(current_visitor));
+            }
+        });
+
+        socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new SalonFullEvent(current_visitor));
             }
         });
 
