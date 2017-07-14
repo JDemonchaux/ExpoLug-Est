@@ -46,4 +46,10 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="powered_by_devloop">Powered by Devloop</string>
+
+    <string name="dialog_button_yes">Ok</string>
+    <string name="dialog_button_no">Annuler</string>
+    <string name="dialog_error_title">Attention!</string>
+    <string name="dialog_err_wifi">Vous devez activer votre Wifi</string>
+    <string name="dialog_err_serv_not_found">Le server n\'est pas configuré ou est inaccessible, veuillez vérifier la configuration depuis les paramètres</string>
 </resources>

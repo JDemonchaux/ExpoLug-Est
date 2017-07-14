@@ -22,18 +22,21 @@
         android:layout_margin="10dp"
         android:elevation="10dp"
         android:padding="12dp"
-        android:background="#FFFFFF">
+        android:background="@color/colorPrimary">
 
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center|center"/>
 
-        <TextView
+        <fr.devloop.compteursalonlego.UI.AmaticBoldTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center|center"
+            android:textAlignment="center"
             android:padding="16dp"
+            android:textSize="24sp"
+            android:textColor="@color/white"
             android:text=""
             android:id="@+id/text_progress"/>
 

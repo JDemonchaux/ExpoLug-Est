@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 import fr.devloop.compteursalonlego.Library.Salon;
+import fr.devloop.compteursalonlego.UI.DevloopErrorDialog;
 import io.socket.client.IO;
 
 public class SplashActivity extends AppCompatActivity {
@@ -194,48 +195,52 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void displayWifiDisabledAlert() {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle("Attention")
-                .setMessage("Vous devez activer votre wifi")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // start network settings
-                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // exit the app
-                        activity.finish();
-                        System.exit(0);
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+//        AlertDialog.Builder builder;
+//        builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Attention")
+//                .setMessage("Vous devez activer votre wifi")
+//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // start network settings
+//                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+//                    }
+//                })
+//                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // exit the app
+//                        activity.finish();
+//                        System.exit(0);
+//                    }
+//                })
+//                .setIcon(android.R.drawable.ic_dialog_alert)
+//                .show();
+        DevloopErrorDialog dialog = new DevloopErrorDialog(this, DevloopErrorDialog.ERR_WIFI);
+        dialog.show();
     }
 
     private void displayServerNeedConfigurationAlert() {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle("Attention")
-                .setMessage("Le server n'est pas configuré ou est inaccessible, veuillez vérifier la configuration depuis les paramètres")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // start network settings
-                        startActivity(new Intent(activity, SettingsActivity.class));
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // exit the app
-                        activity.finish();
-                        System.exit(0);
-                    }
-                })
-                .setCancelable(false)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+//        AlertDialog.Builder builder;
+//        builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Attention")
+//                .setMessage("Le server n'est pas configuré ou est inaccessible, veuillez vérifier la configuration depuis les paramètres")
+//                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // start network settings
+//                        startActivity(new Intent(activity, SettingsActivity.class));
+//                    }
+//                })
+//                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // exit the app
+//                        activity.finish();
+//                        System.exit(0);
+//                    }
+//                })
+//                .setCancelable(false)
+//                .setIcon(android.R.drawable.ic_dialog_alert)
+//                .show();
+        DevloopErrorDialog dialog = new DevloopErrorDialog(this, DevloopErrorDialog.ERR_SERVER_NOT_FOUND);
+        dialog.show();
     }
 
 
