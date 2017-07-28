@@ -25,6 +25,7 @@ public class DevloopErrorDialog extends Dialog implements android.view.View.OnCl
 
     public static final int ERR_WIFI = 0;
     public static final int ERR_SERVER_NOT_FOUND = 1;
+    public static final int ERR_DB_NOT_OPEN = 2;
 
 
     int ERROR_CODE;
@@ -69,6 +70,10 @@ public class DevloopErrorDialog extends Dialog implements android.view.View.OnCl
                     activity.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                 } else if (ERROR_CODE == ERR_SERVER_NOT_FOUND) {
                     activity.startActivity(new Intent(activity, SettingsActivity.class));
+                } else if (ERROR_CODE == ERR_DB_NOT_OPEN) {
+                    dismiss();
+                    activity.finish();
+                    System.exit(0);
                 }
                 dismiss();
                 break;

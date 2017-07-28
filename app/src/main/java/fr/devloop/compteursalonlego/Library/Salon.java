@@ -1,7 +1,9 @@
 package fr.devloop.compteursalonlego.Library;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.os.NetworkOnMainThreadException;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -31,6 +34,7 @@ import fr.devloop.compteursalonlego.MainActivity;
 import fr.devloop.compteursalonlego.OutActivity;
 import fr.devloop.compteursalonlego.R;
 import fr.devloop.compteursalonlego.SettingsActivity;
+import fr.devloop.compteursalonlego.UI.DevloopErrorDialog;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -56,6 +60,9 @@ public class Salon {
 
     public static int MAX_VISITOR = 1600;
 
+    public static final String API_DB_OPENING = "databaseOpening";
+    public static final String API_DB_OPENED = "databaseOpened";
+    public static final String API_DB_OPEN_ERROR = "databaseOpenError";
     public static final String API_GET_VISITOR = "countVisitor";
     public static final String API_ADD_VISITOR = "addVisitor";
     public static final String API_REMOVE_VISITOR = "removeVisitor";
@@ -70,7 +77,7 @@ public class Salon {
     public static String CURRENT_STATUS = "";
 
     public static Integer current_visitor = 0;
-
+    ProgressDialog dialog;
 
     private Salon(Context ctx) {
         instance = this;
@@ -173,86 +180,118 @@ public class Salon {
      */
     private void listenForNotifications() {
 
-            socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
-                @Override
-                public void call(final Object... args) {
-                    Log.d("SOCKETIO", "GET VISITOR");
-                    CURRENT_VISITOR = Integer.parseInt(args[0].toString());
-                    EventBus.getDefault().post(new SocketGetVisitorEvent());
+        socket.on(Salon.API_GET_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(final Object... args) {
+                Log.d("SOCKETIO", "GET VISITOR");
+                CURRENT_VISITOR = Integer.parseInt(args[0].toString());
+                EventBus.getDefault().post(new SocketGetVisitorEvent());
+            }
+        });
+        socket.on(API_MAX_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "MAX VISITOR");
+                try {
+                    MAX_VISITOR = Integer.parseInt(args[0].toString());
+                } catch (Exception e) {
+                    Log.d("Salon", e.getMessage());
                 }
-            });
-            socket.on(API_MAX_VISITOR, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.d("SOCKETIO", "MAX VISITOR");
-                    try {
-                        MAX_VISITOR = Integer.parseInt(args[0].toString());
-                    } catch (Exception e) {
-                        Log.d("Salon", e.getMessage());
-                    }
-                }
-            });
+            }
+        });
 
-            socket.on(API_GET_VISITOR, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    current_visitor = Integer.parseInt(args[0].toString());
-                }
-            });
+        socket.on(API_GET_VISITOR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                current_visitor = Integer.parseInt(args[0].toString());
+            }
+        });
 
-            socket.on(API_NOTIFY_VISITOR_ALMOST_FULL, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    EventBus.getDefault().post(new SalonAlmostFullEvent(current_visitor));
-                }
-            });
+        socket.on(API_NOTIFY_VISITOR_ALMOST_FULL, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new SalonAlmostFullEvent(current_visitor));
+            }
+        });
 
-            socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    EventBus.getDefault().post(new SalonFullEvent(current_visitor));
-                }
-            });
+        socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new SalonFullEvent(current_visitor));
+            }
+        });
 
-            socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.d("SOCKETIO", "CONNECTION ERROR");
-                    CURRENT_STATUS = STATUS_ERROR;
-                    EventBus.getDefault().post(new SocketConnectionErrorEvent());
-                }
-            });
+        socket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "CONNECTION ERROR");
+                CURRENT_STATUS = STATUS_ERROR;
+                EventBus.getDefault().post(new SocketConnectionErrorEvent());
+            }
+        });
 
-            socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.d("SOCKETIO", "DISCONNECT");
-                    CURRENT_STATUS = STATUS_ERROR;
-                    EventBus.getDefault().post(new SocketConnectionErrorEvent());
-                }
-            });
+        socket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "DISCONNECT");
+                CURRENT_STATUS = STATUS_ERROR;
+                EventBus.getDefault().post(new SocketConnectionErrorEvent());
+            }
+        });
 
-            socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.d("SOCKETIO", "CONNECTION SUCCESS");
-                    CURRENT_STATUS = STATUS_CONNECTED;
-                    EventBus.getDefault().post(new SocketConnectedEvent());
-                }
-            });
+        socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d("SOCKETIO", "CONNECTION SUCCESS");
+                CURRENT_STATUS = STATUS_CONNECTED;
+                EventBus.getDefault().post(new SocketConnectedEvent());
+            }
+        });
 
-            socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    try {
-                        SalonAlmostFullEvent event = new SalonAlmostFullEvent();
-                        event.visitorNumber = Integer.parseInt(args[0].toString());
-                        EventBus.getDefault().post(event);
-                    } catch (Exception e) {
-                        Log.d("Salon", e.getMessage());
-                    }
+        socket.on(API_NOTIFY_VISITOR_FULL, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                try {
+                    SalonAlmostFullEvent event = new SalonAlmostFullEvent();
+                    event.visitorNumber = current_visitor;
+                    EventBus.getDefault().post(event);
+                } catch (Exception e) {
+                    Log.d("Salon", e.getMessage());
                 }
-            });
+            }
+        });
+
+        /*
+         * Database event
+         */
+        socket.on(API_DB_OPENING, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (dialog == null) {
+                    dialog = new ProgressDialog(context);
+                    dialog.setMessage("Chargement de la base de données");
+                    dialog.setIndeterminate(true);
+                    dialog.setCancelable(false);
+                    dialog.setCanceledOnTouchOutside(false);
+                }
+            }
+        });
+        socket.on(API_DB_OPENED, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        socket.on(API_DB_OPEN_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                DevloopErrorDialog err = new DevloopErrorDialog((Activity) context, DevloopErrorDialog.ERR_SERVER_NOT_FOUND);
+                err.show();
+            }
+        });
+
     }
 
 

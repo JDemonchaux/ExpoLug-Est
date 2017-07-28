@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CompteurSalonLego</string>
+    <string name="app_name">Compteur Salon Lego</string>
     <string name="app_title">Compteur Salon Lego</string>
 
     <string name="label_number_visitor">Visiteur(s) actuellement dans le salon</string>
