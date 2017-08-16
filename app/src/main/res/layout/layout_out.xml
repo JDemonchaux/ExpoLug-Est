@@ -115,14 +115,7 @@
                 android:padding="32dp"
                 android:text="@string/button_out_5"
                 android:textColor="@color/white"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                tools:layout_conversion_absoluteHeight="0dp"
-                tools:layout_conversion_absoluteWidth="288dp"
-                tools:layout_conversion_absoluteX="16dp"
-                tools:layout_conversion_absoluteY="492dp" />
+                android:textSize="20sp" />
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>
