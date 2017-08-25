@@ -268,11 +268,17 @@ public class Salon {
             @Override
             public void call(Object... args) {
                 if (dialog == null) {
-                    dialog = new ProgressDialog(context);
-                    dialog.setMessage("Chargement de la base de données");
-                    dialog.setIndeterminate(true);
-                    dialog.setCancelable(false);
-                    dialog.setCanceledOnTouchOutside(false);
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog = new ProgressDialog(context);
+                            dialog.setMessage("Chargement de la base de données");
+                            dialog.setIndeterminate(true);
+                            dialog.setCancelable(false);
+                            dialog.setCanceledOnTouchOutside(false);
+                        }
+                    });
+
                 }
             }
         });
@@ -280,10 +286,16 @@ public class Salon {
             @Override
             public void call(Object... args) {
                 if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                        }
+                    });
                 }
             }
         });
+
         socket.on(API_DB_OPEN_ERROR, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
